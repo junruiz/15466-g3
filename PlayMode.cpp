@@ -13,11 +13,9 @@
 #include <random>
 #include <iostream>
 
-
 void drop(Scene::Transform *note, Scene::Transform *r_do, Scene::Transform *r_re, Scene::Transform *r_mi,
           Scene::Transform *r_fa, Scene::Transform *r_sol, Scene::Transform *r_la, Scene::Transform *r_si,
 		  Scene::Transform *r_piano) {
-	std::cout << r_piano->position.y << "\n";
 	if (r_do->position.x - 5.7f < note->position.x && r_do->position.x + 4.7f > note->position.x &&
 	    r_do->position.y - 4.7f < note->position.y && r_do->position.y + 4.7f > note->position.y) {
 			if (note->position.z > r_do->position.z + 7.0f + 0.2f) {
@@ -135,8 +133,36 @@ Load< Scene > piano_scene(LoadTagDefault, []() -> Scene const * {
 	});
 });
 
-Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("dusty-floor.opus"));
+Load< Sound::Sample > star_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("star.wav"));
+});
+
+Load< Sound::Sample > do_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("do.wav"));
+});
+
+Load< Sound::Sample > re_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("re.wav"));
+});
+
+Load< Sound::Sample > mi_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("mi.wav"));
+});
+
+Load< Sound::Sample > fa_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("fa.wav"));
+});
+
+Load< Sound::Sample > sol_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("sol.wav"));
+});
+
+Load< Sound::Sample > la_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("la.wav"));
+});
+
+Load< Sound::Sample > si_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("si.wav"));
 });
 
 PlayMode::PlayMode() : scene(*piano_scene) {
@@ -174,8 +200,7 @@ PlayMode::PlayMode() : scene(*piano_scene) {
 	camera = &scene.cameras.front();
 
 	// //start music loop playing:
-	// // (note: position will be over-ridden in update())
-	// leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, get_leg_tip_position(), 10.0f);
+	// star_loop = Sound::play(*star_sample, 1.0f, 0.0f);
 }
 
 PlayMode::~PlayMode() {
@@ -202,6 +227,10 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.keysym.sym == SDLK_s) {
 			keys.downs += 1;
 			keys.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_p) {
+			next.downs += 1;
+			next.pressed = true;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_UP) {
 			up.downs += 1;
@@ -232,6 +261,9 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
 			keys.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_p) {
+			next.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_UP) {
 			up.pressed = false;
@@ -269,6 +301,51 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	return false;
 }
 
+std::string check_playmusic(Scene::Transform *note, Scene::Transform *r_do, Scene::Transform *r_re, Scene::Transform *r_mi,
+          Scene::Transform *r_fa, Scene::Transform *r_sol, Scene::Transform *r_la, Scene::Transform *r_si) {
+	if (r_do->position.x - 5.7f < note->position.x && r_do->position.x + 4.7f > note->position.x &&
+	    r_do->position.y - 4.7f < note->position.y && r_do->position.y + 4.7f > note->position.y &&
+		note->position.z == r_do->position.z + 7.0f) {
+			return "do";
+		}
+	if (r_re->position.x - 5.7f < note->position.x && r_re->position.x + 4.7f > note->position.x &&
+	    r_re->position.y - 4.7f < note->position.y && r_re->position.y + 4.7f > note->position.y &&
+		note->position.z == r_re->position.z + 7.0f) {
+			return "re";
+		}
+
+	if (r_mi->position.x - 5.7f < note->position.x && r_mi->position.x + 4.7f > note->position.x &&
+	    r_mi->position.y - 4.7f < note->position.y && r_mi->position.y + 4.7f > note->position.y &&
+		note->position.z == r_mi->position.z + 7.0f) {
+			return "mi";
+		}
+	
+	if (r_fa->position.x - 10.0f < note->position.x && r_fa->position.x + 10.0f > note->position.x &&
+	    r_fa->position.y - 10.0f < note->position.y && r_fa->position.y + 10.0f > note->position.y &&
+		note->position.z == r_fa->position.z + 7.0f) {
+			return "fa";
+		}
+
+	if (r_sol->position.x - 5.7f < note->position.x && r_sol->position.x + 4.7f > note->position.x &&
+	    r_sol->position.y - 4.7f < note->position.y && r_sol->position.y + 4.7f > note->position.y &&
+		note->position.z == r_sol->position.z + 7.0f) {
+			return "sol";
+		}
+
+	if (r_la->position.x - 5.7f < note->position.x && r_la->position.x + 4.7f > note->position.x &&
+	    r_la->position.y - 4.7f < note->position.y && r_la->position.y + 4.7f > note->position.y &&
+		note->position.z == r_la->position.z + 7.0f) {
+			return "la";
+		}
+
+	if (r_si->position.x - 5.7f < note->position.x && r_si->position.x + 4.7f > note->position.x &&
+	    r_si->position.y - 4.7f < note->position.y && r_si->position.y + 4.7f > note->position.y &&
+		note->position.z == r_si->position.z + 7.0f) {
+			return "si";
+		}
+	return "nothing";
+}
+
 void PlayMode::update(float elapsed) {
 
 	//change the note position:
@@ -278,7 +355,7 @@ void PlayMode::update(float elapsed) {
 
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
-		glm::vec2 move = glm::vec2(0.0f);
+		glm::vec3 move = glm::vec3(0.0f);
 		glm::vec2 moveCamera = glm::vec2(0.0f);
 
 		if (keya.pressed && !keyd.pressed) move.x = -1.0f;
@@ -292,7 +369,7 @@ void PlayMode::update(float elapsed) {
 		if (!down.pressed && up.pressed) moveCamera.y = 1.0f;
 
 		//make it so that moving diagonally doesn't go faster:
-		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
+		if (move != glm::vec3(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 		if (moveCamera != glm::vec2(0.0f)) moveCamera = glm::normalize(moveCamera) * PlayerSpeed * elapsed;
 
 		glm::mat4x3 frame = camera->transform->make_local_to_parent();
@@ -304,7 +381,29 @@ void PlayMode::update(float elapsed) {
 		note->position.x += move.x;
 		note->position.y += move.y;
 
+		if (next.pressed) {
+			note->position.z += 5.0f;
+		}
+
 		drop(note, r_do, r_re, r_mi, r_fa, r_sol, r_la, r_si, r_piano);
+		std::string key_play = check_playmusic(note, r_do, r_re, r_mi, r_fa, r_sol, r_la, r_si);
+
+		if (next.pressed) locked = false;
+		if (key_play != "nothing") {
+			auto key_sample = re_sample;
+			if (key_play == "do") key_sample = do_sample;
+			if (key_play == "re") key_sample = re_sample;
+			if (key_play == "mi") key_sample = mi_sample;
+			if (key_play == "fa") key_sample = fa_sample;
+			if (key_play == "sol") key_sample = sol_sample;
+			if (key_play == "la") key_sample = la_sample;
+			if (key_play == "si") key_sample = si_sample;
+
+			if (locked == false) {
+				key_once = Sound::play(*key_sample, 1.0f, 0.0f);
+				locked = true;
+			}
+		}
 	}
 
 	//reset button press counters:
@@ -312,6 +411,8 @@ void PlayMode::update(float elapsed) {
 	right.downs = 0;
 	up.downs = 0;
 	down.downs = 0;
+
+
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -346,13 +447,21 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
-			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+		lines.draw_text("Press Space to get the song you need to produce",
+			glm::vec3(-aspect + 0.1f * H, 0.85f + 0.1f * H, 0.0),
+			glm::vec3(H, 0.0f, 1.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+		lines.draw_text("Use WSAD to land the note on different places to produce sounds! Press P between each sound.",
+			glm::vec3(-aspect + 0.1f * H, 0.65f + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
-			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
+		lines.draw_text("Press Space to get the song you need to produce",
+			glm::vec3(-aspect + 0.1f * H + ofs, 0.85f + + 0.1f * H + ofs, 0.0),
+			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		lines.draw_text("Use WSAD to land the note on different places to produce sounds! Press P between each sound",
+			glm::vec3(-aspect + 0.1f * H + ofs, 0.65 + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
