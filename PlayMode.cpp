@@ -11,6 +11,105 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <random>
+#include <iostream>
+
+
+void drop(Scene::Transform *note, Scene::Transform *r_do, Scene::Transform *r_re, Scene::Transform *r_mi,
+          Scene::Transform *r_fa, Scene::Transform *r_sol, Scene::Transform *r_la, Scene::Transform *r_si,
+		  Scene::Transform *r_piano) {
+	std::cout << r_piano->position.y << "\n";
+	if (r_do->position.x - 5.7f < note->position.x && r_do->position.x + 4.7f > note->position.x &&
+	    r_do->position.y - 4.7f < note->position.y && r_do->position.y + 4.7f > note->position.y) {
+			if (note->position.z > r_do->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_do->position.z + 5.0f){
+				note->position.z = r_do->position.z + 7.0f;
+			}
+			return;
+		}
+	if (r_re->position.x - 5.7f < note->position.x && r_re->position.x + 4.7f > note->position.x &&
+	    r_re->position.y - 4.7f < note->position.y && r_re->position.y + 4.7f > note->position.y) {
+			if (note->position.z > r_re->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_re->position.z + 5.0f){
+				note->position.z = r_re->position.z + 7.0f;
+			}
+			return;
+		}
+
+	if (r_mi->position.x - 5.7f < note->position.x && r_mi->position.x + 4.7f > note->position.x &&
+	    r_mi->position.y - 4.7f < note->position.y && r_mi->position.y + 4.7f > note->position.y) {
+			if (note->position.z > r_mi->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_mi->position.z + 5.0f){
+				note->position.z = r_mi->position.z + 7.0f;
+			}
+			return;
+		}
+	
+	if (r_fa->position.x - 10.0f < note->position.x && r_fa->position.x + 10.0f > note->position.x &&
+	    r_fa->position.y - 10.0f < note->position.y && r_fa->position.y + 10.0f > note->position.y) {
+			if (note->position.z > r_fa->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_fa->position.z + 5.0f) {
+				note->position.z = r_fa->position.z + 7.0f;
+			}
+			return;
+		}
+
+	if (r_sol->position.x - 5.7f < note->position.x && r_sol->position.x + 4.7f > note->position.x &&
+	    r_sol->position.y - 4.7f < note->position.y && r_sol->position.y + 4.7f > note->position.y) {
+			if (note->position.z > r_sol->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_sol->position.z + 5.0f) {
+				note->position.z = r_sol->position.z + 7.0f;
+			}
+			return;
+		}
+
+	if (r_la->position.x - 5.7f < note->position.x && r_la->position.x + 4.7f > note->position.x &&
+	    r_la->position.y - 4.7f < note->position.y && r_la->position.y + 4.7f > note->position.y) {
+			if (note->position.z > r_la->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_la->position.z + 5.0f) {
+				note->position.z = r_la->position.z + 7.0f;
+			}
+			return;
+		}
+
+	if (r_si->position.x - 5.7f < note->position.x && r_si->position.x + 4.7f > note->position.x &&
+	    r_si->position.y - 4.7f < note->position.y && r_si->position.y + 4.7f > note->position.y) {
+			if (note->position.z > r_si->position.z + 7.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_si->position.z + 5.0f){
+				note->position.z = r_si->position.z + 7.0f;
+			}
+			return;
+		}
+	if (r_piano->position.x - 19.0f < note->position.x && r_piano->position.x + 11.0f > note->position.x &&
+	    r_piano->position.y - 7.0f < note->position.y && r_piano->position.y + 15.0f > note->position.y) {
+			if (note->position.z > r_piano->position.z + 9.0f + 0.2f) {
+				note->position.z -= 0.2f;
+			}
+			else if (note->position.z > r_piano->position.z + 7.0f){
+				note->position.z = r_piano->position.z + 9.0f;
+			}
+			return;
+		}
+	else {
+		if (note->position.z > -48.0f) {
+			note->position.z -= 0.2f;
+		}
+	}
+	return;
+}
 
 GLuint piano_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > piano_meshes(LoadTagDefault, []() -> MeshBuffer const * {
@@ -42,15 +141,30 @@ Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample c
 
 PlayMode::PlayMode() : scene(*piano_scene) {
 	//get pointers to leg for convenience:
-	// for (auto &transform : scene.transforms) {
+	for (auto &transform : scene.transforms) {
+		// std::cout << transform.name;
+		if (transform.name == "Sphere.001") note = &transform;
+		else if (transform.name == "do") r_do = &transform;
+		else if (transform.name == "re") r_re = &transform;
+		else if (transform.name == "mi") r_mi = &transform;
+		else if (transform.name == "fa") r_fa = &transform;
+		else if (transform.name == "sol") r_sol = &transform;
+		else if (transform.name == "la") r_la = &transform;
+		else if (transform.name == "si") r_si = &transform;
+		else if (transform.name == "black1") r_piano = &transform;
+	}
 	// 	if (transform.name == "Hip.FL") hip = &transform;
 	// 	else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
 	// 	else if (transform.name == "LowerLeg.FL") lower_leg = &transform;
 	// }
-	// if (hip == nullptr) throw std::runtime_error("Hip not found.");
-	// if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
-	// if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
+	if (note == nullptr) throw std::runtime_error("Character not found.");
+	if (r_do == nullptr || r_re == nullptr || r_mi == nullptr || r_fa == nullptr
+	    || r_sol == nullptr || r_la == nullptr || r_si == nullptr) {
+			throw std::runtime_error("key not found.");
+		}
+	
 
+	note_org_position = note->position;
 	// hip_base_rotation = hip->rotation;
 	// upper_leg_base_rotation = upper_leg->rotation;
 	// lower_leg_base_rotation = lower_leg->rotation;
@@ -74,34 +188,62 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_a) {
-			left.downs += 1;
-			left.pressed = true;
+			keya.downs += 1;
+			keya.pressed = true;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_d) {
-			right.downs += 1;
-			right.pressed = true;
+			keyd.downs += 1;
+			keyd.pressed = true;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_w) {
+			keyw.downs += 1;
+			keyw.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_s) {
+			keys.downs += 1;
+			keys.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_UP) {
 			up.downs += 1;
 			up.pressed = true;
 			return true;
-		} else if (evt.key.keysym.sym == SDLK_s) {
+		} else if (evt.key.keysym.sym == SDLK_DOWN) {
 			down.downs += 1;
 			down.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_LEFT) {
+			left.downs += 1;
+			left.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_RIGHT) {
+			right.downs += 1;
+			right.pressed = true;
 			return true;
 		}
 	} else if (evt.type == SDL_KEYUP) {
 		if (evt.key.keysym.sym == SDLK_a) {
-			left.pressed = false;
+			keya.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_d) {
-			right.pressed = false;
+			keyd.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.pressed = false;
+			keyw.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
+			keys.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_UP) {
+			up.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_DOWN) {
 			down.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_LEFT) {
+			left.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_RIGHT) {
+			right.pressed = false;
 			return true;
 		}
 	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
@@ -137,27 +279,32 @@ void PlayMode::update(float elapsed) {
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
 		glm::vec2 move = glm::vec2(0.0f);
-		if (left.pressed && !right.pressed) move.x =-1.0f;
-		if (!left.pressed && right.pressed) move.x = 1.0f;
-		if (down.pressed && !up.pressed) move.y =-1.0f;
-		if (!down.pressed && up.pressed) move.y = 1.0f;
+		glm::vec2 moveCamera = glm::vec2(0.0f);
+
+		if (keya.pressed && !keyd.pressed) move.x = -1.0f;
+		if (!keya.pressed && keyd.pressed) move.x = 1.0f;
+		if (keys.pressed && !keyw.pressed) move.y = -1.0f;
+		if (!keys.pressed && keyw.pressed) move.y = 1.0f;
+
+		if (left.pressed && !right.pressed) moveCamera.x = -1.0f;
+		if (!left.pressed && right.pressed) moveCamera.x = 1.0f;
+		if (down.pressed && !up.pressed) moveCamera.y = -1.0f;
+		if (!down.pressed && up.pressed) moveCamera.y = 1.0f;
 
 		//make it so that moving diagonally doesn't go faster:
 		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
+		if (moveCamera != glm::vec2(0.0f)) moveCamera = glm::normalize(moveCamera) * PlayerSpeed * elapsed;
 
 		glm::mat4x3 frame = camera->transform->make_local_to_parent();
 		glm::vec3 frame_right = frame[0];
 		//glm::vec3 up = frame[1];
 		glm::vec3 frame_forward = -frame[2];
 
-		camera->transform->position += move.x * frame_right + move.y * frame_forward;
-	}
+		camera->transform->position += moveCamera.x * frame_right + moveCamera.y * frame_forward;
+		note->position.x += move.x;
+		note->position.y += move.y;
 
-	{ //update listener to camera position:
-		glm::mat4x3 frame = camera->transform->make_local_to_parent();
-		glm::vec3 frame_right = frame[0];
-		glm::vec3 frame_at = frame[3];
-		Sound::listener.set_position_right(frame_at, frame_right, 1.0f / 60.0f);
+		drop(note, r_do, r_re, r_mi, r_fa, r_sol, r_la, r_si, r_piano);
 	}
 
 	//reset button press counters:
