@@ -11,6 +11,7 @@ Here is a quick overview of what is included. For further information, ☺read t
 	- [`PlayMode.hpp`](PlayMode.hpp), [`PlayMode.cpp`](PlayMode.cpp) declaration+definition for a basic PPU demonstration. You'll probably build your game on it.
 	- [`Maekfile.js`](Maekfile.js) build system. Edit to support new asset pipelines as needed. More info below.
 	- [`.gitignore`](.gitignore) ignores generated files. You will need to change it if your executable name changes. (If you find yourself changing it to ignore, e.g., your editor's swap files you should probably, instead, be investigating making this change in the global git configuration.)
+	
 - Useful code (files you should investigate, but probably won't change):
 	- [`Sound.hpp`](Sound.hpp), [`Sound.cpp`](Sound.cpp) `Sound` namespace, functions for `Sample` loading and playback in 2D and 3D.
 	- [`Mesh.hpp`](Mesh.hpp), [`Mesh.cpp`](Mesh.cpp) mesh loading.
