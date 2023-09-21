@@ -23,7 +23,7 @@ struct PlayMode : Mode {
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up, keya, keyw, keyd, keys, next;
+	} left, right, down, up, keya, keyw, keyd, keys, next, space, restart;
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
@@ -70,4 +70,9 @@ struct PlayMode : Mode {
 	std::shared_ptr< Sound::PlayingSample > part_once;
 
 	bool locked = false;
+	bool playSuccessSong = false;
+	bool SuccessSongPlaying = false;
+	bool lose = false;
+
+	std::string message = "";
 };

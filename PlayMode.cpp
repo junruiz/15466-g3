@@ -13,6 +13,18 @@
 #include <random>
 #include <iostream>
 
+glm::vec2 checkState(bool state[6][7]) {
+	 for (int row = 0; row < 6; row++) {
+        for (int col = 0; col < 7; col++) {
+            if (state[row][col] == false) {
+				return glm::vec2{row, col};
+			}
+		}
+    }
+	return glm::vec2{10, 10};
+}
+
+
 void drop(Scene::Transform *note, Scene::Transform *r_do, Scene::Transform *r_re, Scene::Transform *r_mi,
           Scene::Transform *r_fa, Scene::Transform *r_sol, Scene::Transform *r_la, Scene::Transform *r_si,
 		  Scene::Transform *r_piano) {
@@ -105,6 +117,9 @@ void drop(Scene::Transform *note, Scene::Transform *r_do, Scene::Transform *r_re
 		if (note->position.z > -48.0f) {
 			note->position.z -= 0.2f;
 		}
+		else {
+			// star_loop = Sound::play(*lose_sample, 1.0f, 0.0f);
+		}
 	}
 	return;
 }
@@ -163,6 +178,18 @@ Load< Sound::Sample > la_sample(LoadTagEarly, []() -> Sound::Sample const * {
 
 Load< Sound::Sample > si_sample(LoadTagEarly, []() -> Sound::Sample const * {
 	return new Sound::Sample(data_path("si.wav"));
+});
+
+Load< Sound::Sample > star1_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("star1.wav"));
+});
+
+Load< Sound::Sample > star2_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("star2.wav"));
+});
+
+Load< Sound::Sample > star3_sample(LoadTagEarly, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("star3.wav"));
 });
 
 PlayMode::PlayMode() : scene(*piano_scene) {
@@ -232,6 +259,14 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			next.downs += 1;
 			next.pressed = true;
 			return true;
+		} else if (evt.key.keysym.sym == SDLK_r) {
+			restart.downs += 1;
+			restart.pressed = true;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_SPACE) {
+			space.downs += 1;
+			space.pressed = true;
+			return true;
 		} else if (evt.key.keysym.sym == SDLK_UP) {
 			up.downs += 1;
 			up.pressed = true;
@@ -264,6 +299,12 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_p) {
 			next.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_r) {
+			restart.pressed = false;
+			return true;
+		} else if (evt.key.keysym.sym == SDLK_SPACE) {
+			space.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_UP) {
 			up.pressed = false;
@@ -352,16 +393,28 @@ void PlayMode::update(float elapsed) {
 
 	//move camera:
 	{
-
+		if (restart.pressed) {
+			locked = false;
+			playSuccessSong = false;
+			SuccessSongPlaying = false;
+			lose = false;
+			for (int row = 0; row < 6; row++) {
+				for (int col = 0; col < 7; col++) {
+					state[row][col] = false;
+				}
+			}
+			note->position = note_org_position;
+			message = "";
+		}
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
 		glm::vec3 move = glm::vec3(0.0f);
 		glm::vec2 moveCamera = glm::vec2(0.0f);
 
-		if (keya.pressed && !keyd.pressed) move.x = -1.0f;
-		if (!keya.pressed && keyd.pressed) move.x = 1.0f;
-		if (keys.pressed && !keyw.pressed) move.y = -1.0f;
-		if (!keys.pressed && keyw.pressed) move.y = 1.0f;
+		if (keya.pressed && !keyd.pressed) move.x = 1.0f;
+		if (!keya.pressed && keyd.pressed) move.x = -1.0f;
+		if (keys.pressed && !keyw.pressed) move.y = 1.0f;
+		if (!keys.pressed && keyw.pressed) move.y = -1.0f;
 
 		if (left.pressed && !right.pressed) moveCamera.x = -1.0f;
 		if (!left.pressed && right.pressed) moveCamera.x = 1.0f;
@@ -377,16 +430,52 @@ void PlayMode::update(float elapsed) {
 		//glm::vec3 up = frame[1];
 		glm::vec3 frame_forward = -frame[2];
 
-		camera->transform->position += moveCamera.x * frame_right + moveCamera.y * frame_forward;
-		note->position.x += move.x;
-		note->position.y += move.y;
-
-		if (next.pressed) {
-			note->position.z += 5.0f;
+		if (!lose) {
+			camera->transform->position += moveCamera.x * frame_right + moveCamera.y * frame_forward;
+			note->position.x += move.x;
+			note->position.y += move.y;
+			if (next.pressed) {
+				note->position.z += 5.0f;
+			}
 		}
 
-		drop(note, r_do, r_re, r_mi, r_fa, r_sol, r_la, r_si, r_piano);
+		// check which part of music should be played.
+		glm::vec2 key_pos = checkState(state);
+		if (space.pressed) {
+			if (key_pos.x == 10) {
+			}
+			else {
+				if (int(key_pos.x) == 0 || int(key_pos.x) == 4) {
+					part_once = Sound::play(*star1_sample, 1.0f, 0.0f);
+				}
+				else if (int(key_pos.x) == 1 || int(key_pos.x) == 5) {
+					part_once = Sound::play(*star2_sample, 1.0f, 0.0f);
+				}
+				else if (int(key_pos.x) == 2 || int(key_pos.x) == 3) {
+					part_once = Sound::play(*star3_sample, 1.0f, 0.0f);
+				}
+			}
+		}
+
+		if (note->position.z < -48 && !playSuccessSong) {
+			lose = true;
+			message = "You lose :( Press R to restart.";
+		}
+
+		if (!lose) {
+			drop(note, r_do, r_re, r_mi, r_fa, r_sol, r_la, r_si, r_piano);
+		}
 		std::string key_play = check_playmusic(note, r_do, r_re, r_mi, r_fa, r_sol, r_la, r_si);
+
+		if (key_pos.x == 10 && !SuccessSongPlaying) {
+			playSuccessSong = true;
+			message = "You win! Press R to restart.";
+		}
+
+		if (!SuccessSongPlaying && playSuccessSong) {
+			star_loop = Sound::play(*star_sample, 1.0f, 0.0f);
+			SuccessSongPlaying = true;
+		}
 
 		if (next.pressed) locked = false;
 		if (key_play != "nothing") {
@@ -399,8 +488,26 @@ void PlayMode::update(float elapsed) {
 			if (key_play == "la") key_sample = la_sample;
 			if (key_play == "si") key_sample = si_sample;
 
-			if (locked == false) {
+			if (!locked && !lose) {
 				key_once = Sound::play(*key_sample, 1.0f, 0.0f);
+				if (key_pos.x == 10) {
+				} else {
+					if (key_pos.y == 0) {
+							message = "";
+					}
+					message += key_play;
+					std::string required_key = rhythm[(int)key_pos.x][(int)key_pos.y];
+					if (required_key == key_play) {
+						message += " ";
+						state[(int)key_pos.x][(int)key_pos.y] = true;
+					} else {
+						message += "(x) ";
+						 for (int col = 0; col < 7; col++) {
+							state[(int)key_pos.x][col] = false;
+						 }
+					}
+				}
+				// check if is the correct key to press
 				locked = true;
 			}
 		}
@@ -455,13 +562,21 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			glm::vec3(-aspect + 0.1f * H, 0.65f + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+		lines.draw_text(message,
+			glm::vec3(-aspect + 0.1f * H, -1.0f + 0.1f * H, 0.0),
+			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
 		lines.draw_text("Press Space to get the song you need to produce",
 			glm::vec3(-aspect + 0.1f * H + ofs, 0.85f + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 		lines.draw_text("Use WSAD to land the note on different places to produce sounds! Press P between each sound",
-			glm::vec3(-aspect + 0.1f * H + ofs, 0.65 + + 0.1f * H + ofs, 0.0),
+			glm::vec3(-aspect + 0.1f * H + ofs, 0.65f + + 0.1f * H + ofs, 0.0),
+			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		lines.draw_text(message,
+			glm::vec3(-aspect + 0.1f * H + ofs, -1.0f + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
